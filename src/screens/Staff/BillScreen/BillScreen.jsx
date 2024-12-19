@@ -29,6 +29,7 @@ const BillScreen = () => {
         try {
             setLoading(true);
             const order = await getAllOrder(moment(new Date(date)).format("YYYY-MM-DD").toString());
+            console.log(order);
             setOrders(order);
         } catch (error) {
             console.log("====================================");

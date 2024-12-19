@@ -3,7 +3,7 @@ import { useLayoutEffect } from "react";
 import Header from "~/components/ui/Header";
 import PATHS from "~/constants/path.constant";
 
-const useAppBar = ({ options = {}, title, isShowGoBackHome = false, pathHome = PATHS.HOME, staffName }) => {
+const useAppBarWithStaff = ({ options = {}, title, isShowGoBackHome = false, pathHome = PATHS.HOME, staffName }) => {
     const navigation = useNavigation();
 
     useLayoutEffect(() => {
@@ -15,7 +15,7 @@ const useAppBar = ({ options = {}, title, isShowGoBackHome = false, pathHome = P
                         isBack={back}
                         isShowGoBackHome={isShowGoBackHome}
                         pathHome={pathHome}
-                        staffName={staffName}
+                        
                     />
                 );
             },
@@ -30,4 +30,4 @@ const useAppBar = ({ options = {}, title, isShowGoBackHome = false, pathHome = P
     }, [options, title]);
 };
 
-export default useAppBar;
+export default useAppBarWithStaff;

@@ -6,6 +6,7 @@ import {
     RefreshControl,
     StyleSheet,
     Text,
+    TextInput,
     TouchableOpacity,
     View,
 } from "react-native";
@@ -19,7 +20,9 @@ import { formatPrice } from "~/utils/number";
 
 const HomeScreen = () => {
     useAppBar({ title: "Danh sách bàn" });
+    const [search, setSearch] = useState('');
     const [tables, setTables] = useState([]);
+    const [searchTables, setSearchTables] = useState([]);
     const [loading, setLoading] = useState(false);
 
     const getData = async () => {
@@ -29,12 +32,37 @@ const HomeScreen = () => {
             const data = await getAllTables(true);
 
             setTables(data);
+            // gan du lieu vao searchTable
+            setSearchTables(data);
         } catch (error) {
             console.log("====================================");
             console.log(`error get data tables `, error);
             console.log("====================================");
         } finally {
             setLoading(false);
+        }
+    };
+
+    const searchFilterFunction = (text) => {
+        // Check if searched text is not blank
+        if (text) {
+          // Inserted text is not blank
+          // Filter the masterDataSource and update FilteredDataSource
+          const newData = tables.filter(function (item) {
+            // Applying filter for the inserted text in search bar
+            const itemData = item.name
+              ? item.name.toUpperCase()
+              : ''.toUpperCase();
+            const textData = text.toUpperCase();
+            return itemData.indexOf(textData) > -1;
+          });
+          setSearchTables(newData);
+          setSearch(text);
+        } else {
+          // Inserted text is blank
+          // Update FilteredDataSource with masterDataSource
+          setSearchTables(tables);
+          setSearch(text);
         }
     };
 
@@ -111,6 +139,16 @@ const HomeScreen = () => {
 
     return (
         <View className="flex-1 bg-white">
+            <View style={styles.searchContainer}>
+                <TextInput 
+                    style={styles.textInput}
+                    onChangeText={(text) => searchFilterFunction(text)}
+                    value={search}
+                    placeholder="Nhập tên bàn..."                                                                                                              
+                />
+                <MaterialIcons name="search" size={30} color="gray" style={styles.icon} />
+            </View>
+            
             <FlatList
                 refreshControl={
                     <RefreshControl
@@ -125,7 +163,7 @@ const HomeScreen = () => {
                 refreshing={false}
                 onRefresh={handleRefreshing}
                 contentContainerStyle={{ padding: 15 }}
-                data={tables}
+                data={searchTables}
                 renderItem={renderItem}
                 keyExtractor={keyExtract}
                 numColumns={2}
@@ -138,4 +176,27 @@ const HomeScreen = () => {
 
 export default HomeScreen;
 
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+    searchContainer: {
+        flexDirection: 'row',
+        //justifyContent: 'center',
+        alignItems:'center',
+        marginRight:  25
+    },
+    textInput: {
+        borderColor: 'gray',
+        borderWidth: 1,
+        marginTop: 15,
+        marginLeft: 25,
+        //marginRight: 25,
+        borderRadius: 10,
+        height: 45,
+        paddingLeft: 12,
+        flex: 1,
+        fontSize: 18
+    },
+    icon: {
+        marginTop: 15,
+        marginLeft: -32
+    }
+});

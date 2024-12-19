@@ -5,7 +5,7 @@ import PATHS from "~/constants/path.constant";
 import { goBack, navigate } from "~/routes/config/navigation";
 import { themeColors } from "~/theme";
 
-const Header = ({ name, isBack = false, isShowGoBackHome = false, pathHome = PATHS.HOME }) => {
+const Header = ({ name, isBack = false, isShowGoBackHome = false, pathHome = PATHS.HOME, staffName }) => {
     const navigation = useNavigation();
 
     return (
@@ -25,18 +25,21 @@ const Header = ({ name, isBack = false, isShowGoBackHome = false, pathHome = PAT
                             <FontAwesome name="bars" size={20} color="black" />
                         </TouchableOpacity>
                     )}
-
-                    <Text style={styles.textHeader}>{name}</Text>
+                    <View style={styles.descriptContainer}>
+                        <Text style={styles.textHeader}>{name}</Text>
+                        <Text style={styles.staffName}>{staffName}</Text>
+                    </View>
+                    
                 </View>
 
-                <View className="flex-row gap-2 items-center">
+                <View className="flex-row gap-2 items-center" >
                     {isShowGoBackHome ? (
                         <TouchableOpacity
                             onPress={() => navigate(pathHome)}
                             activeOpacity={0.75}
-                            style={styles.back}
+                            style={styles.home}
                         >
-                            <Feather name="home" size={20} color="black" />
+                            <Feather name="home" size={20} color="black"/>
                         </TouchableOpacity>
                     ) : null}
                 </View>
@@ -64,10 +67,23 @@ const styles = StyleSheet.create({
         justifyContent: "center",
         alignItems: "center",
     },
+
+    home: {
+        width: 30,
+        height: 30,
+        backgroundColor: "white",
+        borderRadius: 10,
+        justifyContent: "center",
+        alignItems: "center",
+        marginBottom: -20,
+        marginRight: 10,
+    },
     wrapHeaderLeft: {
         flexDirection: "row",
-        alignItems: "center",
+        //alignItems: "center",
         justifyContent: "center",
+        marginTop: 35,
+        marginLeft: 10,
         gap: 8,
     },
     wrapHeader: {
@@ -85,10 +101,22 @@ const styles = StyleSheet.create({
     },
     textHeader: {
         fontWeight: "bold",
-        fontSize: 15,
+        fontSize: 20,
         color: "white",
-        flex: 1,
+        //flex: 1,
         flexWrap: "wrap",
         maxWidth: 230,
+        
     },
+    descriptContainer: {
+        flexDirection: 'column',
+        //justifyContent: 'center',
+        //alignItems: 'center'
+    },
+    staffName: {
+        fontWeight: "bold",
+        fontSize: 15,
+        color: "white",
+        flexWrap: "wrap",
+    }
 });

@@ -12,8 +12,8 @@ export const BuyOptions = {
 
 export const labelBuyOption = (option) => {
     const options = {
-        [BuyOptions.BACK_HOME]: "Về nhà",
-        [BuyOptions.AT_TABLE]: "Tại bàn",
+        [BuyOptions.BACK_HOME]: "Mang đi",
+        [BuyOptions.AT_TABLE]: "Tại quán",
     };
     return options[option];
 };

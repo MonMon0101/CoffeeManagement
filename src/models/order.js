@@ -103,6 +103,7 @@ export const getOrderById = async (id) => {
         }
 
         const data = foodsSnapshot.data();
+        console.log(data);
 
         const [user, paymentByStaff, table] = await Promise.all([
             getUserById(data.userId),
@@ -148,6 +149,8 @@ export const changeStatusOrder = async (status, id) => {
 
 export const updateOrder = async (data, id) => {
     try {
+        console.log(id);
+        console.log(data);
         await firestore().collection("orders").doc(id).update(data);
         return true;
     } catch (error) {

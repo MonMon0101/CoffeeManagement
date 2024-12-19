@@ -11,6 +11,7 @@ import {
     Text,
     TouchableOpacity,
     View,
+    TextInput,
 } from "react-native";
 import Toast from "react-native-toast-message";
 import { BLUR_HASH } from "~/constants/image.constant";
@@ -24,13 +25,17 @@ import { useAuth } from "~/stores/slices/authSlice";
 import { themeColors } from "~/theme";
 import { formatPrice } from "~/utils/number";
 import QuantityInput from "./components/QuantityInput";
+import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 
 const OrderTableScreen = () => {
     const { params } = useRoute();
     useAppBar({ title: `Chi tiết ${params?.name}` });
+    const [search, setSearch] = useState('');
     const [lastOrder, setLastOrder] = useState(null);
     const [loading, setLoading] = useState(false);
     const [productsCategories, setProductsCategories] = useState([]);
+    const [searchProductsCategories, setSearchProductsCategories] = useState([]);
+
     const { user } = useAuth();
     const snapPoints = useMemo(() => ["13%", "80%"], []);
     const bottomSheetRef = useRef(null);
@@ -45,6 +50,10 @@ const OrderTableScreen = () => {
             setLoading(true);
             const categories = await getProductsCategories();
             setProductsCategories(categories);
+
+            // sea
+            setSearchProductsCategories(categories);
+
         } catch (error) {
             console.log("====================================");
             console.log(`error get categories`, error);
@@ -78,6 +87,7 @@ const OrderTableScreen = () => {
             ]);
 
             setProductsCategories(categories);
+            setSearchProductsCategories(categories);
             setLastOrder(order);
         } catch (error) {
             console.log("====================================");
@@ -93,6 +103,25 @@ const OrderTableScreen = () => {
             fetchAll();
         }, [params?.id])
     );
+
+    const searchFilterFunction = (text) => {
+        // Check if searched text is not blank
+        if (text) {
+          
+          const newData = productsCategories.map((item) => 
+            ({...item, 
+                products: item.products.filter((product) =>
+                    product.name.toLowerCase().includes(text.toLowerCase())),
+            })).filter((item) => item.products.length > 0);
+        
+          setSearchProductsCategories(newData);
+          setSearch(text);
+        } else {
+        
+          setSearchProductsCategories(productsCategories);
+          setSearch(text);
+        }
+    };
 
     const handleAddOrder = async (item) => {
         if (lastOrder) {
@@ -174,6 +203,8 @@ const OrderTableScreen = () => {
                     >
                         {item.name}
                     </Text>
+
+                    
 
                     <FlatList
                         data={item.products}
@@ -288,7 +319,6 @@ const OrderTableScreen = () => {
         };
 
         // 2. update order
-
         try {
             await updateOrder(prevLastOrder, lastOrder.id);
             await fetchLastOrder();
@@ -301,6 +331,15 @@ const OrderTableScreen = () => {
 
     return (
         <View className="flex-1 bg-white">
+            <View style={styles.searchContainer}>
+                        <TextInput 
+                            style={styles.textInput}
+                            onChangeText={(text) => searchFilterFunction(text)}
+                            value={search}
+                            placeholder="Nhập món cần tìm..."                                                                                                              
+                        />
+                        <MaterialIcons name="search" size={30} color="gray" style={styles.icon} />
+                    </View>
             <FlatList
                 refreshControl={
                     <RefreshControl
@@ -312,7 +351,7 @@ const OrderTableScreen = () => {
                 refreshing={false}
                 onRefresh={handleRefreshing}
                 contentContainerStyle={{ padding: 15 }}
-                data={productsCategories}
+                data={searchProductsCategories}
                 renderItem={renderItem}
                 keyExtractor={keyExtract}
                 ItemSeparatorComponent={spacingCom}
@@ -440,4 +479,27 @@ const styles = StyleSheet.create({
         padding: 10,
         position: "relative",
     },
+
+    searchContainer: {
+        flexDirection: 'row',
+        //justifyContent: 'center',
+        alignItems:'center',
+        marginRight:  25
+    },
+    textInput: {
+        borderColor: 'gray',
+        borderWidth: 1,
+        marginTop: 15,
+        marginLeft: 25,
+        //marginRight: 25,
+        borderRadius: 10,
+        height: 45,
+        paddingLeft: 12,
+        flex: 1,
+        fontSize: 18
+    },
+    icon: {
+        marginTop: 15,
+        marginLeft: -32
+    }
 });

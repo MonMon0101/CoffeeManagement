@@ -8,6 +8,7 @@ import {
     RefreshControl,
     StyleSheet,
     Text,
+    TextInput,
     TouchableOpacity,
     View,
 } from "react-native";
@@ -24,11 +25,14 @@ import ChoseBuyOption from "./components/ChoseBuyOption";
 import QuantityInput from "./components/QuantityInput";
 import { useAuth } from "~/stores/slices/authSlice";
 
+//Quy add
+import { getUserById } from "../../../models/user";
+
 const OrderDetails = () => {
     const { params } = useRoute();
-    useAppBar({ title: `Chi tiết order: ${params?.name}`, isShowGoBackHome: true });
     const [lastOrder, setLastOrder] = useState(null);
     const [loading, setLoading] = useState(false);
+    const [userObj, setUserObj] = useState(null);
     const { user } = useAuth();
 
     const fetchLastOrder = useCallback(async () => {
@@ -36,6 +40,10 @@ const OrderDetails = () => {
             setLoading(true);
             const order = await getLastOrderByTable(params?.id);
             setLastOrder(order);
+
+            // Lay thong tin user dang nhap
+            getDataUser(order.userId);
+
         } catch (error) {
             console.log("====================================");
             console.log(`error fetchLastOrder`, error);
@@ -45,11 +53,25 @@ const OrderDetails = () => {
         }
     }, [params?.id]);
 
+    const getDataUser = async (userId) => {
+        try {
+            const data = await getUserById(userId);
+            setUserObj(data);
+        } catch (error) {
+            console.log("====================================");
+            console.log(`error get data tables `, error);
+            console.log("====================================");
+        } finally {
+        }
+    };
+
     useFocusEffect(
         useCallback(() => {
             fetchLastOrder();
         }, [])
     );
+
+    useAppBar({ title: `Chi tiết order: ${params?.name}`, isShowGoBackHome: true, staffName: `${userObj?.displayName}` });
 
     const handleOnDecrement = async (item) => {
         // 1. find item in last order
@@ -245,20 +267,20 @@ const OrderDetails = () => {
             <View style={styles.bottomSheet}>
                 <View className="w-full flex-row justify-between">
                     <View>
-                        <Text className="text-base font-semibold">
+                        <Text className="text-base font-semibold ml-2">
                             Đã chọn: {lastOrder?.products?.reduce((t, v) => t + v.quantity, 0)} thức
                             uống
                         </Text>
-                        <Text className="text-base font-semibold">
+                        <Text className="text-base font-semibold ml-2">
                             Tổng tiền:{" "}
                             {formatPrice(
                                 lastOrder?.products?.reduce((t, v) => t + v.quantity * v.price, 0)
                             )}
                         </Text>
 
-                        <Text className="text-base font-semibold mt-2">Hình thức mua:</Text>
+                        <Text className="text-base font-semibold mt-2 ml-2">Hình thức mua:</Text>
 
-                        <View className="mt-1 ml-2">
+                        <View className="mt-1 ml-4">
                             {Object.keys(BuyOptions).map((key) => {
                                 return (
                                     <ChoseBuyOption
@@ -314,4 +336,5 @@ const styles = StyleSheet.create({
         padding: 10,
         minHeight: 100,
     },
+    
 });
